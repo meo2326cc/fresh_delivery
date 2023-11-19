@@ -1,0 +1,27 @@
+
+@import 'bootstrap/scss/functions';
+//@import 'reset-css/reset.css';
+@import './variables';
+@import 'bootstrap/scss/bootstrap';
+@import 'material-icons/iconfont/material-icons.css';
+
+*,*::before,*::after {
+    box-sizing: border-box;
+}
+
+ul{
+    padding-left: 0;
+}
+
+li{
+    list-style: none;
+    padding: 0;
+}
+
+.material-icons{
+    vertical-align: bottom;
+}
+
+.sidebar{
+    width: 260px;
+}
