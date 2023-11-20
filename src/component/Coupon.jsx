@@ -1,14 +1,12 @@
 import axios from "axios";
 import { useEffect, useReducer, useRef, memo, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router"
 import { Modal } from 'bootstrap';
+import Pending from "./Pending";
 
-export default function Admin() {
-    const toIndexPage = useNavigate();
+export default function Coupon() {
+    //const toIndexPage = useNavigate();
     const modalController = useRef(null)
-    const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
-    axios.defaults.headers.common['Authorization'] = token;
     const reducer = (state, action) => {
         switch (action.type) {
             case 'ADDDATA': return { ...state, datas: action.payload, network: true }
@@ -16,17 +14,13 @@ export default function Admin() {
             case 'ADD': return { ...state, modalUsage: { type: '新增品項', cache: null } }
             case 'EDIT': return { ...state, modalUsage: { type: '修改品項', cache: action.payload } }
             case 'DEL': return { ...state, modalUsage: { type: '刪除', cache: action.payload } }
+            case 'PENDING': return { ...state, pending:true }
+            case 'FINISHED': return { ...state, pending:false }
+
+
         }
     }
-    const [state, dispatch] = useReducer(reducer, { datas: [], network: true, modalUsage: { type: '新增品項', cache: null } })
-
-    const logout = async function () {
-        await axios.post('https://ec-course-api.hexschool.io/v2/logout');
-        document.cookie = 'hexToken=';
-        toIndexPage('/')
-    }
-
-    console.log('父元件渲染')
+    const [state, dispatch] = useReducer(reducer, { datas: [], pending:false , network: true, modalUsage: { type: '新增品項', cache: null } })
 
     const openEditModal = function (e) {
         if (!(e.target.dataset.itemId == state.modalUsage.cache?.id && state.modalUsage.type === '修改品項')) {
@@ -50,13 +44,14 @@ export default function Admin() {
     }
 
     const getData = useCallback(async function () {
+        dispatch({type:'PENDING'})
         try {
-            const res = await axios.get(import.meta.env.VITE_PATH_ADMIN_PRODUCTS_ALL)
-            const handleData = Object.values(res.data.products);
-            handleData.shift()
-            dispatch({ type: 'ADDDATA', payload: handleData })
+            const res = await axios.get(import.meta.env.VITE_PATH_ADMIN_COUPONS_ALL)
+            dispatch({ type: 'ADDDATA', payload: res.data.coupons })
+            dispatch({type:'FINISHED'})
         } catch (err) {
             console.log(err)
+            dispatch({type:'FINISHED'})
             dispatch({ type: 'NETWORK' })
         }
     }, [])
@@ -64,92 +59,53 @@ export default function Admin() {
 
 
     useEffect(() => {
-        if (token === '' || token === undefined) {
-            return toIndexPage('/')
-        }
         getData()
-    }, [token])
-
+    }, [])
 
     return (<>
-        <div className="d-flex vh-100">
-            <div className="sidebar d-none d-md-flex justify-content-center bg-light pt-10" id="collapseExample">
-                <ul className="fs-6 w-100 text-center list-group">
-                    <li className="py-3 text-dark list-group-item-action">產品列表</li>
-                    <li className="py-3 text-dark list-group-item-action">優惠券列表</li>
-                    <li className="py-3 text-dark list-group-item-action">管理訂單</li>
-                </ul>
-            </div>
-            <div className="dashboard flex-grow-1 overflow-auto">
-                {/* nav */}
-                <div className="sticky-top border-1 ps-3 py-3 nav navbar-expand-md border d-flex justify-content-between align-items-center container-fluid bg-white">
-                    <div>
-                    <button className="btn d-md-none border" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-                    <span className="material-icons">menu</span>
-                    </button>     
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <p className="me-3">歡迎</p>
-                        <button className="btn btn-danger" type="button" onClick={logout}>登出</button></div>
-                    </div>
-
-                {/* canva */}
-                <div className="offcanvas offcanvas-start" tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-                    <div className="offcanvas-header">
-                        {/* <h5 className="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5> */}
-                        <button type="button" className="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div className="offcanvas-body">
-                        <div>
-                            <ul className="fs-6 w-100 text-center list-group">
-                                <li className="py-3 text-dark list-group-item-action">產品列表</li>
-                                <li className="py-3 text-dark list-group-item-action">優惠券列表</li>
-                                <li className="py-3 text-dark list-group-item-action">管理訂單</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
 
                 <div className="container-fluid">
-                    <h2 className="mt-3 mb-5">產品列表-管理員</h2>
-                    <button type="button" className="btn btn-primary mb-3" onClick={openAddModal}>新增品項</button>
+                    <h2 className="mt-3 mb-5">優惠券列表-管理員</h2>
+                    <button type="button" className="btn btn-primary mb-3" onClick={openAddModal}>新增優惠券</button>
                     {state.network ?
+                    <div className="position-relative">
+                         
                         <table className="table table-striped align-middle">
                             <thead>
                                 <tr className="border-dark">
                                     <th>#</th>
                                     <th>title</th>
-                                    <th>category</th>
-                                    <th>price</th>
+                                    <th>code</th>
+                                    <th>due_date</th>
                                     <th>啟用</th>
+                                    <th>percent</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
+                            {state.pending && <Pending/>} 
                             <tbody>
-                                    {
-                                        state.datas.map((item, index) => {
-                                            return (<tr key={index}>
-                                                <th> {index + 1} </th>
-                                                <td>{item.title}</td>
-                                                <td>{item.category}</td>
-                                                <td>{item.price}</td>
-                                                <td>{item?.is_enable ? '是' : '否'}</td>
-                                                <td>
-                                                    <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-warning m-1" type="button" onClick={openEditModal}>修改</button>
-                                                    <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-danger m-1" type="button" onClick={openDelModal}>刪除</button> </td>
-                                            </tr>)
-                                        })
-                                    }
+                                {
+                                    state.datas.map((item, index) => {
+                                        return (<tr key={index}>
+                                            <th> {index + 1} </th>
+                                            <td>{item.title}</td>
+                                            <td>{item.code}</td>
+                                            <td>{item.due_date}</td>
+                                            <td>{item?.is_enable ? '是' : '否'}</td>
+                                            <td>{item.percent}</td>
+                                            <td>
+                                                <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-warning m-1" type="button" onClick={openEditModal}>修改</button>
+                                                <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-danger m-1" type="button" onClick={openDelModal}>刪除</button> </td>
+                                        </tr>)
+                                    })
+                                }
                             </tbody>
                         </table>
+                    </div>
                         :
-
                         <div className="alert alert-danger">取得資料發生錯誤</div>}
-
+                    <ModalWindow modalController={modalController} editStatus={state.modalUsage} getData={getData} />
                 </div>
-            </div>
-        </div>
-        <ModalWindow modalController={modalController} editStatus={state.modalUsage} getData={getData} />
     </>)
 }
 
@@ -164,7 +120,6 @@ const ModalWindow = memo(({ modalController, editStatus, getData }) => {
         setValue
     } = useForm()
 
-    console.log('mmm')
 
     useEffect(() => {
         setValue('title', cache?.title)
@@ -180,7 +135,7 @@ const ModalWindow = memo(({ modalController, editStatus, getData }) => {
 
     const delProduct = async () => {
         try {
-            await axios.delete(import.meta.env.VITE_PATH_ADMIN_PRODUCT + cache.id)
+            await axios.delete(import.meta.env.VITE_PATH_ADMIN_COUPON + cache.id)
             getData()
         } catch (error) {
             console.log(error)
@@ -189,19 +144,19 @@ const ModalWindow = memo(({ modalController, editStatus, getData }) => {
 
     const editProduct = async function (data) {
         try {
-            await axios.put(import.meta.env.VITE_PATH_ADMIN_PRODUCT + cache.id, { "data": { ...data, price: Number(data.price), origin_price: Number(data.price) } })
+            await axios.put(import.meta.env.VITE_PATH_ADMIN_COUPON + cache.id, { "data": { ...data, price: Number(data.price), origin_price: Number(data.price) } })
             getData()
-            
+
         } catch (error) {
             console.log(error)
         }
-        
+
     }
     const addData = async function (data) {
         try {
             const res = await axios.post(import.meta.env.VITE_PATH_ADMIN_PRODUCT, { "data": { ...data, price: Number(data.price), origin_price: Number(data.price) } })
             console.log(res)
-            
+
             getData()
 
         } catch (error) {
@@ -225,11 +180,11 @@ const ModalWindow = memo(({ modalController, editStatus, getData }) => {
                 <div className="modal-dialog modal-lg modal-dialog-scrollable">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h5 className="modal-title">刪除{cache.title}</h5>
+                            <h5 className="modal-title">刪除優惠券：{cache.title}</h5>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <p>確定要刪除{cache.title}嗎？</p>
+                            <p>確定要刪除優惠券：{cache.title}嗎？</p>
                         </div>
                         <div className="modal-footer">
                             <button type="button" onClick={delProduct} className="btn btn-danger px-16" data-bs-dismiss="modal">刪除</button>

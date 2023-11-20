@@ -24,7 +24,7 @@ export function Login() {
             const res = await axios.post(import.meta.env.VITE_PATH_ADMIN_SIGNIN, form)
             const { expired, token } = res.data
             document.cookie = `hexToken=${token}; expires=${new Date(expired)}`
-            navigate('/admin')
+            navigate('/admindashboard/products')
 
         } catch (error) {
             console.log(error)
@@ -38,9 +38,9 @@ export function Login() {
     useEffect(()=>{
         const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
         axios.defaults.headers.common['Authorization'] = token;
-        if (token !== '' || token !== undefined) {
-            return navigate('/admin')
-        }
+        // if (token !== undefined ) {
+        //     return navigate('/admindashboard/products')
+        // }
     },[])
     
     return (
