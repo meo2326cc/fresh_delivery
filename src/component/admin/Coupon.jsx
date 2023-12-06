@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useReducer, useRef, memo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Modal } from 'bootstrap';
-import Pending from "./Pending";
+import Pending from "../Pending";
 
 export default function Coupon() {
     //const toIndexPage = useNavigate();

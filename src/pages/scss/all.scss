@@ -2,15 +2,24 @@
 @import 'bootstrap/scss/functions';
 //@import 'reset-css/reset.css';
 @import './variables';
+@import './utilities';
 @import 'bootstrap/scss/bootstrap';
+
+
 @import 'material-icons/iconfont/material-icons.css';
 
 *,*::before,*::after {
     box-sizing: border-box;
 }
 
+::selection {
+    background: $secondary;
+    color: #fff;
+  }
+
 ul{
     padding-left: 0;
+    margin-bottom: 0;
 }
 
 li{
@@ -18,25 +27,63 @@ li{
     padding: 0;
 }
 
+.z-index-10000{
+    z-index: 10000;
+}
+
 .material-icons{
-    vertical-align: bottom;
+    vertical-align: middle;
 }
 
-.sidebar{
-    width: 260px;
+.background-center{
+    background-position: center;
 }
 
-.opacity-background{
-    background-color: rgba(255, 255, 255, 0.5);
+.background-cover{
+    background-size: cover;
 }
 
+.banner{
+    height: 400px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position:center;
+}
+
+.table{
+  .bg-unset{
+    background-color: unset;
+}  
+}
+
+.object-fit{
+    object-fit: cover;
+}
+
+.top--16{
+    top: -16px;
+}
+
+.right-8{
+    right: 8%;
+}
+
+.slideChild{
+    max-width: 1440px;
+}
+
+.cartPage{
+    max-width: 500px;
+    margin: auto;
+}
+
+//loading animation
 .pending{
- animation-name: pending-animation;
- animation-duration: 2s;
- animation-iteration-count:infinite;
- animation-timing-function:linear;
-
-}
+    animation-name: pending-animation;
+    animation-duration: 2s;
+    animation-iteration-count:infinite;
+    animation-timing-function:linear;
+   }
 
 @keyframes pending-animation {
     from{
@@ -45,4 +92,37 @@ li{
     to{
         transform: rotate(360deg);
     }
+}
+
+//card hover zoom animation
+.transition-zoom{
+    display: block;
+    width: 100%;
+    transition: scale .3s;
+
+    button{
+        display: none;
+    }
+}
+.transition-zoom:hover{
+    scale: 1.04;
+
+    & button{
+        display: block;
+    }
+
+}
+
+//slide animation
+.transition-slide-parent:hover{
+    & .transition-slide{
+        opacity: 1;
+        left: 0%;
+    }
+}
+.transition-slide{
+    opacity: 0;
+    left: 100%;
+    transition:  opacity .3s , left .3s;
+
 }

@@ -1,9 +1,18 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect  } from "react";
 import { useNavigate , Outlet , Link} from "react-router-dom"
+//import { reducer , state as notificationState , NotificationContext } from "../component/ToastStore.jsx";
 import { Offcanvas } from 'bootstrap';
+import Toast from "../component/Toast";
+import { Provider } from "react-redux";
+import { ToastStore } from "../component/Store";
+
 
 export default function AdminDashboard() {
+
+
+
+
     const toIndexPage = useNavigate();
     const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
     axios.defaults.headers.common['Authorization'] = token;
@@ -22,9 +31,11 @@ export default function AdminDashboard() {
         }
     }, [])    
 
-    return (<>
+    return (
+        <Provider store={ToastStore}>
+        <Toast/>
         <div className="d-flex vh-100">
-            <div className="sidebar d-none d-md-flex justify-content-center bg-light pt-10" id="collapseExample">
+            <div className="w-260px d-none d-md-flex justify-content-center bg-light pt-10" id="collapseExample">
                 <ul className="fs-6 w-100 text-center list-group">
                     <li className="text-dark list-group-item-action"><Link to='products' className="d-block py-3">產品列表</Link></li>
                     <li className="text-dark list-group-item-action"><Link to='coupon' className="d-block py-3">優惠券列表</Link></li>
@@ -64,6 +75,5 @@ export default function AdminDashboard() {
                 <Outlet/>
 
             </div>
-        </div>
-    </>)
+        </div></Provider >)
 }

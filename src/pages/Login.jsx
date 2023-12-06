@@ -38,7 +38,7 @@ export function Login() {
     useEffect(()=>{
         const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
         axios.defaults.headers.common['Authorization'] = token;
-        // if (token !== undefined ) {
+        // if (token !== '' ) {
         //     return navigate('/admindashboard/products')
         // }
     },[])

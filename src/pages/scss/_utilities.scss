@@ -1,0 +1,69 @@
+$utilities: (
+  "width-px": (
+    property: width,
+    class:w,
+    values: (
+      20px:20px,
+      38px:38px,
+      48px:48px,
+      50px: 50px,
+      100px: 100px,
+      200px: 200px,
+      260px:260px,
+      300px: 300px,
+      400px: 400px,
+    )
+  ),
+  "height-px": (
+    property:height,
+    class:h,
+    values: (
+      20px:20px,
+      38px:38px,
+      50px: 50px,
+      100px: 100px,
+      200px: 200px,
+      300px: 300px,
+      400px: 400px,
+    )
+  ),
+  "gray-bg": (
+    property:background-color,
+    class:bg,
+    values: (
+      "gray-100": $gray-100,
+      "gray-200": $gray-200,
+      "gray-300": $gray-300,
+      "gray-400": $gray-400,
+      "gray-500": $gray-500,
+      "gray-600": $gray-600,
+      "gray-700": $gray-700,
+      "gray-800": $gray-800,
+      "gray-900": $gray-900
+    )
+  ),
+  "gray": (
+    property:color,
+    class:text,
+    values: (
+      "gray-100": $gray-100,
+      "gray-200": $gray-200,
+      "gray-300": $gray-300,
+      "gray-400": $gray-400,
+      "gray-500": $gray-500,
+      "gray-600": $gray-600,
+      "gray-700": $gray-700,
+      "gray-800": $gray-800,
+      "gray-900": $gray-900
+    )
+  ),
+  "opacity-background": (
+    property:background-color,
+    class:opacity-background,
+    values: (
+      "gray":rgba(255, 255, 255, 0.5),
+      "primary":rgba(121, 85, 72, 0.5)
+    )
+  )
+
+ );
