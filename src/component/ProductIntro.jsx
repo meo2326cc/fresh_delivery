@@ -3,6 +3,7 @@ import axios from "axios"
 import { useParams } from "react-router"
 import { useDispatch } from "react-redux"
 import { success , fail } from "./ToastSlice"
+import { update } from "./CartSlice"
 //import { state as notificationState, reducer, NotificationContext } from './ToastStore.jsx'
 
 function Product() {
@@ -10,6 +11,7 @@ function Product() {
     const [product, setProduct] = useState()
     const [cartQuantity, setCartQuantity] = useState(1)
     const notificationDispatch = useDispatch()
+    const cartDispatch = useDispatch()
     const cartBtn = useRef(null)
     const cartBtnMobile = useRef(null)
     const setBtnDisable = ()=> { 
@@ -19,6 +21,15 @@ function Product() {
      const setBtnEnable = ()=> { 
         cartBtn.current.classList.remove('disabled')
         cartBtnMobile.current.classList.remove('disabled')
+     }
+
+     const cartUpdate = async ()=>{
+        try{
+            const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
+            cartDispatch(update( res.data.data ))
+        }catch{
+            notificationDispatch(fail('更新購物車資料失敗'))
+        }
      }
 
     useEffect(() => {
@@ -43,6 +54,7 @@ function Product() {
                 }
             })
             notificationDispatch(success('新增商品至購物車成功' ))
+            cartUpdate()
         } catch (error) {
             console.log(error)
             notificationDispatch(fail( '新增商品至購物車失敗' ))

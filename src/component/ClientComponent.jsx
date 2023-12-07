@@ -1,15 +1,19 @@
 import { Link } from 'react-router-dom'
 import logo from '../img/logo.png'
-import { useRef, useState, memo, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
+import { useDispatch , useSelector  } from 'react-redux'
+import { update } from './CartSlice'
 import axios from 'axios'
 
 
 export function ClientNav() {
-
-  const [cartContent, setCartContent] = useState([])
   const cartIsLoading = useRef(null)
   const cartListControl = useRef(null)
-  const requestCount = useRef(1)
+  const cartDispatch = useDispatch()
+  const cartData = useSelector((data) => {
+    return data.cartUpdate
+  } )
+  const { carts:cartContent } = cartData 
   const loading = () => {
     cartIsLoading.current.classList.remove('d-none')
   }
@@ -19,18 +23,16 @@ export function ClientNav() {
 
 
   async function getCartData() {
-    requestCount.current++
-    if (requestCount.current % 2 === 0) {
       try {
         loading()
         const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
         console.log(res)
-        setCartContent(res.data.data.carts)
+        //setCartContent(res.data.data.carts)
+        cartDispatch(update( res.data.data ))
         loadingOver()
       } catch (error) {
         console.log(error)
       }
-    }
   }
 
   async function delCartItem(id) {
@@ -38,8 +40,8 @@ export function ClientNav() {
     try {
       await axios.delete(import.meta.env.VITE_PATH_CLIENT_CART + id)
       const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
-      setCartContent(res.data.data.carts)
-      
+      //setCartContent(res.data.data.carts)
+      cartDispatch(update( res.data.data ))
     } catch (error) {
       console.log(error)
       
@@ -48,6 +50,9 @@ export function ClientNav() {
     }
   }
 
+useEffect(()=>{
+  getCartData()
+},[])
 
 
   return (<>
@@ -63,7 +68,7 @@ export function ClientNav() {
           </ul>
         </div>
         <div className="d-flex align-items-center">
-          <button onClick={getCartData} type='button' data-bs-target="#cartList" data-bs-toggle="collapse" className='btn btn-link d-flex'><span className="material-icons">shopping_cart</span>{ cartContent.length > 0 && <span className='bg-danger text-white p-1 d-block  fs-7'>{cartContent.length}</span> }</button>
+          <button type='button' data-bs-target="#cartList" data-bs-toggle="collapse" className='btn btn-link d-flex'><span className="material-icons">shopping_cart</span>  <span className={`bg-danger p-1 d-block  fs-7 ${cartContent.length > 0 ? 'bg-danger text-white' : 'bg-gray-300 text-black'}`}>{cartContent.length}</span> </button>
           
           <button className="btn d-md-none border ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
             <span className="material-icons">menu</span>
@@ -90,7 +95,7 @@ export function ClientNav() {
               <div className="w-75 ps-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <p>{item.product.title}</p>
-                  <button type='button' className='btn btn-link text-danger p-0 px-1' onClick={() => { delCartItem(item.id) }}><span className='material-icons fs-6 fw-bold'>close</span></button>
+                  <button type='button' className='btn btn-link text-danger p-0 pe-3' onClick={() => { delCartItem(item.id) }}><span className='material-icons-outlined fs-5 align-text-bottom '>delete_forever</span></button>
                 </div>
                 <p className='text-secondary'> 數量：{item.qty}</p>
               </div>
@@ -98,7 +103,7 @@ export function ClientNav() {
           })}
 
         </div>
-        <Link to='cart' onClick={ ()=>{cartListControl.current.classList.remove('show'); requestCount.current++  } } type="button" className='w-100 btn btn-primary mt-2'>前往結帳</Link>
+        <Link to='cart' onClick={ ()=>{cartListControl.current.classList.remove('show') } } type="button" className='w-100 btn btn-primary mt-2'>前往結帳</Link>
       </div>
     </div>
       </div>
@@ -125,7 +130,7 @@ export function ClientNav() {
 }
 
 export function Footer() {
-  return (<div className="bg-primary">
+  return (<div className="bg-primary" >
     <div className="container py-10">
       <img src={logo} alt="logo" />
     </div>

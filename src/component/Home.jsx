@@ -2,6 +2,7 @@ import axios from "axios"
 import {  useEffect , useState  } from "react";
 import { useDispatch } from "react-redux";
 import { success , fail } from "./ToastSlice";
+import { update } from "./CartSlice";
 import bannerImg from '../img/banner1.webp'
 import imG from '../img/pic.webp'
 import { Link } from "react-router-dom"
@@ -84,6 +85,7 @@ function ProductList () {
 
   const [list , setList] = useState([])
 
+
   useEffect(()=>{
     (async ()=>{
       const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_PRODUCTS_ALL)
@@ -121,17 +123,40 @@ function Card ({item:{  title , imageUrl , id , price , origin_price}}) {
 
   const notificationDispatch = useDispatch()
 
+  const cartDispatch = useDispatch()
+
+  const btnDisable = ()=>{
+    document.querySelectorAll('#addBtn').forEach(el => el.classList.add('disabled'))
+  }
+
+  const btnEnable = ()=>{
+    document.querySelectorAll('#addBtn').forEach(el => el.classList.remove('disabled'))
+  }
+
+  const cartUpdate = async ()=>{
+    try{
+        const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
+        cartDispatch(update( res.data.data ))
+    }catch{
+        notificationDispatch(fail('更新購物車資料失敗'))
+    }
+ }
+
+
   const addToCart = async()=>{
+    btnDisable()
     try{
     await axios.post(import.meta.env.VITE_PATH_CLIENT_CART, { data:{ 
       "product_id": id ,
       "qty": 1
      } })
      notificationDispatch( success( '新增商品至購物車成功' ) )
-
+     cartUpdate()
     }catch(error){
       //console.log(error)
       notificationDispatch( fail( '新增商品至購物車失敗' ))
+    }finally{
+      btnEnable()
     }
   }
 
@@ -144,7 +169,7 @@ function Card ({item:{  title , imageUrl , id , price , origin_price}}) {
           {origin_price !== price && <span className="bg-danger text-white position-absolute px-2 py-1" style={{zIndex:'1'}}>SALE</span>}
           <div className="bg-gray-200 w100 h200px">
             <div className="w-100 object-fit position-relative" style={{ backgroundImage: `url(${imageUrl})`, height: `200px `, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-              <button type="button" onClick={addToCart} className="btn btn-primary w-100 position-absolute bottom-0 text-white" >加入購物車</button>
+              <button type="button" id="addBtn" onClick={addToCart} className="btn btn-primary w-100 position-absolute bottom-0 text-white" >加入購物車</button>
             </div>
           </div>
           <h2 className="fs-5 mt-2 ">{title}</h2>

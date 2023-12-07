@@ -5,13 +5,10 @@ import { useNavigate , Outlet , Link} from "react-router-dom"
 import { Offcanvas } from 'bootstrap';
 import Toast from "../component/Toast";
 import { Provider } from "react-redux";
-import { ToastStore } from "../component/Store";
+import { Store } from "../component/Store";
 
 
 export default function AdminDashboard() {
-
-
-
 
     const toIndexPage = useNavigate();
     const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
@@ -32,7 +29,7 @@ export default function AdminDashboard() {
     }, [])    
 
     return (
-        <Provider store={ToastStore}>
+        <Provider store={Store}>
         <Toast/>
         <div className="d-flex vh-100">
             <div className="w-260px d-none d-md-flex justify-content-center bg-light pt-10" id="collapseExample">
