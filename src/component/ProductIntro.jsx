@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import axios from "axios"
-import { useParams } from "react-router"
+import { useParams , useNavigate } from "react-router"
 import { useDispatch } from "react-redux"
 import { success , fail } from "./ToastSlice"
 import { update } from "./CartSlice"
@@ -8,6 +8,7 @@ import { update } from "./CartSlice"
 
 function Product() {
     const { id } = useParams()
+    const pageNotFound = useNavigate()
     const [product, setProduct] = useState()
     const [cartQuantity, setCartQuantity] = useState(1)
     const notificationDispatch = useDispatch()
@@ -33,11 +34,14 @@ function Product() {
      }
 
     useEffect(() => {
-
         (async () => {
+            try{
             const res = await axios.get(`${import.meta.env.VITE_PATH_CLIENT_PRODUCT}${id}`)
             setProduct(res.data.product)
-            console.log(res)
+            }catch{
+                pageNotFound('/notfound')
+            }
+
         })()
 
     }, [id])
@@ -66,7 +70,7 @@ function Product() {
     return (
         <>
             {product === undefined && <IsLoading/> }
-            <div className="container mt-5">
+            <div className="container mt-5 view-height">
                 <div className="clearfix position-relative">
                     <div className="col-12 d-md-none float-start p-3">
                         <div>
@@ -75,7 +79,7 @@ function Product() {
                                 {product?.price === product?.origin_price ? <h3 className="fs-4 text-primary">NT $ {product?.price}</h3> :
                                     <div>
                                         <p className="text-gray-600"> <del> NT ${product?.origin_price} </del> </p>
-                                        <h3 className="fs-4 text-primary m-0">NT $ {product?.price}</h3>
+                                        <h3 className="fs-4 text-danger m-0">NT $ {product?.price}</h3>
                                     </div>
                                 }
 
@@ -111,7 +115,7 @@ function Product() {
                                 {product?.price === product?.origin_price ? <h3 className="fs-4 text-primary">NT $ {product?.price}</h3> :
                                     <div>
                                         <p className="text-gray-600"> <del> NT ${product?.origin_price} </del> </p>
-                                        <h3 className="fs-4 text-primary m-0">NT $ {product?.price}</h3>
+                                        <h3 className="fs-4 text-danger m-0">NT $ {product?.price}</h3>
                                     </div>
                                 }
 
@@ -120,13 +124,13 @@ function Product() {
                                 </div>
 
                                 <div className="d-flex mt-10 flex-wrap justify-content-between">
-                                    <div className="d-flex ">
+                                    <div className="d-flex mb-3">
                                         <p className=" py-2 my-2">數量（{product?.unit}）</p>
                                         <button type="button" onClick={() => { cartQuantity === 1 ? null : setCartQuantity(prev => prev - 1) }} className=" btn btn-primary w-38px p-0 my-2"><p>-</p></button>
                                         <input type="text" value={cartQuantity} className="border-0 w-50px text-center my-2" readOnly />
-                                        <button type="button" onClick={() => { setCartQuantity(prev => prev + 1) }} className=" btn btn-primary w-38px p-0 me-3 my-2"><p>+</p></button>
+                                        <button type="button" onClick={() => { setCartQuantity(prev => prev + 1) }} className=" btn btn-primary w-38px p-0 my-2"><p>+</p></button>
                                     </div>
-                                    <button type="button" ref={cartBtn} onClick={addToCart} className="btn btn-primary px-9 my-2">加入購物車</button>
+                                    <button type="button" ref={cartBtn} onClick={addToCart} className="btn btn-primary px-5 w-100">加入購物車</button>
                                 </div>
 
                             </div>

@@ -7,7 +7,6 @@ export const cartSlice = createSlice({
     }
     ,reducers:{
         update( state , action ){
-            console.log(action)
             return( action.payload )
         }
     }

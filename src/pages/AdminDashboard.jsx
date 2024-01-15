@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect  } from "react";
+//import { useEffect  } from "react";
 import { useNavigate , Outlet , Link} from "react-router-dom"
 //import { reducer , state as notificationState , NotificationContext } from "../component/ToastStore.jsx";
 import { Offcanvas } from 'bootstrap';
@@ -13,20 +13,19 @@ export default function AdminDashboard() {
     const toIndexPage = useNavigate();
     const token = document.cookie.split(';').find((row) => row.startsWith('hexToken='))?.split('=')[1];
     axios.defaults.headers.common['Authorization'] = token;
+    
 
     const logout = async function () {
         await axios.post(import.meta.env.VITE_PATH_ADMIN_LOGOUT);
         document.cookie = 'hexToken=';
         toIndexPage('/')
     }
-    //
-    console.log(' dashboard - rerender')
-    //
-    useEffect(() => {
-        if (token === '' || token === undefined) {
-         toIndexPage('/')
-        }
-    }, [])    
+
+    // useEffect(() => {
+    //     if (token === '' || token === undefined) {
+    //      toIndexPage('/')
+    //     }
+    // }, [])    
 
     return (
         <Provider store={Store}>
@@ -35,8 +34,8 @@ export default function AdminDashboard() {
             <div className="w-260px d-none d-md-flex justify-content-center bg-light pt-10" id="collapseExample">
                 <ul className="fs-6 w-100 text-center list-group">
                     <li className="text-dark list-group-item-action"><Link to='products' className="d-block py-3">產品列表</Link></li>
-                    <li className="text-dark list-group-item-action"><Link to='coupon' className="d-block py-3">優惠券列表</Link></li>
                     <li className="text-dark list-group-item-action"><Link to='order' className="d-block py-3">管理訂單</Link></li>
+                    <li className="text-dark list-group-item-action"><Link to='article' className="d-block py-3">公告</Link></li>
                 </ul>
             </div>
             <div className="dashboard flex-grow-1 overflow-auto">
@@ -59,11 +58,10 @@ export default function AdminDashboard() {
                     </div>
                     <div className="offcanvas-body">
                         <div>
-                            <ul className="fs-6 w-100 text-center list-group">
+                            <ul className="fs-6 w-100 text-center list-group list-unstyled">
                                <li className="text-dark list-group-item-action" data-bs-dismiss="offcanvas"><Link to="products" className="d-block py-3">產品列表</Link></li>
-                                <li className="text-dark list-group-item-action" data-bs-dismiss="offcanvas"><Link to="coupon" className="d-block py-3">優惠券列表</Link></li>
                                 <li className="text-dark list-group-item-action" data-bs-dismiss="offcanvas"><Link to="order" className="d-block py-3">管理訂單</Link></li>
-                                
+                                <li className="text-dark list-group-item-action" data-bs-dismiss="offcanvas"><Link to="article" className="d-block py-3">公告</Link></li>
                             </ul>
                         </div>
                     </div>

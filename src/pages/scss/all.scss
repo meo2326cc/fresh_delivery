@@ -8,12 +8,22 @@
 
 @import 'material-icons/iconfont/material-icons.css';
 
+
+// #root{
+//     display: flex;
+//     flex-direction: column;
+// }
+
 *,*::before,*::after {
     box-sizing: border-box;
 }
 
+.view-height{
+    min-height: calc(100vh - (75px + 314px ));
+}
+
 ::selection {
-    background: $secondary;
+    background: $gray-500;
     color: #fff;
   }
 
@@ -23,7 +33,6 @@ ul{
 }
 
 li{
-    list-style: none;
     padding: 0;
 }
 
@@ -44,7 +53,7 @@ li{
 }
 
 .banner{
-    height: 400px;
+    //height: 400px;
     background-repeat: no-repeat;
     background-size: cover;
     background-position:center;
@@ -94,6 +103,7 @@ li{
     }
 }
 
+@media(min-width:768px){
 //card hover zoom animation
 .transition-zoom{
     display: block;
@@ -125,4 +135,5 @@ li{
     left: 100%;
     transition:  opacity .3s , left .3s;
 
+}
 }

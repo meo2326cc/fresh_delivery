@@ -1,14 +1,15 @@
 import axios from "axios";
 import { useEffect, useReducer, useRef, memo, useCallback  } from "react";
-import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Modal } from 'bootstrap';
 import { useDispatch } from "react-redux";
 import { success , fail } from "../ToastSlice";
 import FormLoading from "../Pending";
+import { useNavigate } from "react-router";
 
 
-export default function Products() {
+export default function Article() {
+
     const toIndexPage = useNavigate()
     const isLoading = useRef(null)
     const modalController = useRef(null)
@@ -56,23 +57,21 @@ export default function Products() {
     }
 
     const getData = useCallback(async function () {
-
+        
         isLoading.current.classList.remove('d-none')
         try {
-            const res = await axios.get(import.meta.env.VITE_PATH_ADMIN_PRODUCTS_ALL)
-            console.log(res)
-            const handleData = Object.values(res.data.products);
-            handleData.shift()
-            dispatch({ type: 'ADDDATA', payload: handleData })
-
+            const res = await axios.get(import.meta.env.VITE_PATH_ADMIN_ARTICLES_ALL)
+            dispatch({ type: 'ADDDATA', payload: res.data.articles })
+            console.log(res.data.articles)
         } catch(err) {
             dispatch({ type: 'NETWORK' })
-            
-                //  路由保護
-                if(err.response.status === 401 && err.response.data.message === "驗證錯誤, 請重新登入" ) {
-                    document.cookie = 'hexToken=';
-                    toIndexPage('/')
-                }
+            console.log(err)
+
+            //  路由保護
+            if(err.response.status === 401 && err.response.data.message === "驗證錯誤, 請重新登入" ) {
+                document.cookie = 'hexToken=';
+                toIndexPage('/')
+            }
 
         }finally{
             isLoading.current.classList.add('d-none')
@@ -85,7 +84,7 @@ export default function Products() {
 
     return (<>
                 <div className="container-fluid">
-                    <h2 className="mt-3 mb-5">產品列表-管理員</h2>
+                    <h2 className="mt-3 mb-5">公告發佈-管理員</h2>
                     <button type="button" className="btn btn-primary mb-3" onClick={openAddModal}>新增品項</button>
                     {state.network ? 
                     <div className="position-relative">
@@ -95,9 +94,8 @@ export default function Products() {
                                 <tr className="border-dark">
                                     <th>#</th>
                                     <th>title</th>
-                                    <th>category</th>
-                                    <th>price</th>
-                                    <th>啟用</th>
+                                    <th>建立日期</th>
+                                    <th>公開</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -108,9 +106,8 @@ export default function Products() {
                                         return (<tr key={item?.id}>
                                             <th> {index + 1} </th>
                                             <td>{item?.title}</td>
-                                            <td>{item?.category}</td>
-                                            <td>{item?.price}</td>
-                                            <td>{item?.is_enabled ? '是' : '否'}</td>
+                                            <td>{ new Date(item?.create_at).toLocaleString()}</td>
+                                            <td>{item?.isPublic ? '是' : '否'}</td>
                                             <td>
                                                 <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-warning m-1" type="button" onClick={openEditModal}>edit</button>
                                                 <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-danger m-1" type="button" onClick={openDelModal}>del</button> </td>
@@ -135,7 +132,7 @@ export default function Products() {
 
 const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) => {
     
-    //console.log('render_this_form')
+
 
     const { type, cache } = editStatus
 
@@ -143,7 +140,7 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
 
     const submitStatus = useRef(null)
 
-    //console.log(cache)
+
 
     const {
         register,
@@ -153,7 +150,7 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
         formState:{errors}
     } = useForm({mode:'onBlur'})
     
-    const watchfill = watch(['title','price','origin_price','category','unit'])
+    const watchfill = watch(['title','author'])
 
     //欄位皆填寫 && 沒有錯誤 ? 開放按鈕 : 鎖住按鈕
     watchfill.every((item)=> item !== ('' && NaN ) ) &&  (Object.keys(errors)?.[0] === undefined)  ? submitStatus?.current?.classList.remove('disabled') : submitStatus?.current?.classList.add('disabled')
@@ -166,22 +163,12 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
         reset()
         reset({
             title: cache?.title,
-            category: cache?.category,
-            content: cache?.content,
-            price: cache?.price,
-            origin_price: cache?.origin_price,
-            unit: cache?.unit,
-            description: cache?.description,
-            is_enabled: cache?.is_enabled,
-            imageUrl: cache?.imageUrl,
-            imagesUrl:[cache?.imagesUrl[0],
-                       cache?.imagesUrl[1],
-                       cache?.imagesUrl[2],
-                       cache?.imagesUrl[3],
-                       cache?.imagesUrl[4]
-                      ]
-
-
+            author: cache?.author,
+            //content: cache?.content,
+            content: cache?.description, //api未提供此欄位
+            isPublic: cache?.isPublic,
+            //image: cache?.image,
+            create_at: cache?.create_at
         },{keepErrors:false, keepDirtyValues:true , keepDefaultValues:true})
 
         cache === null ?  submitStatus.current.classList.add('disabled') : submitStatus.current.classList.remove('disabled');
@@ -193,7 +180,7 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
     const delProduct = async () => {
         isLoading.current.classList.remove('d-none')
         try {
-            await axios.delete(import.meta.env.VITE_PATH_ADMIN_PRODUCT + cache.id)
+            await axios.delete(import.meta.env.VITE_PATH_ADMIN_ARTICLE + cache.id )
             notificationDispatch(success("刪除成功"))
             getData()
         } catch(error) {
@@ -205,9 +192,8 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
     const editProduct = async function (data) {
         isLoading.current.classList.remove('d-none')
         try {
-            //await axios.put(import.meta.env.VITE_PATH_ADMIN_PRODUCT + cache.id, { "data": { ...data, price: Number(data.price), origin_price: Number(data.origin_price) } })
             console.log(data)
-            await axios.put(import.meta.env.VITE_PATH_ADMIN_PRODUCT + cache.id , { "data": { ...data , is_enabled: data.is_enabled ? 1 : 0  }})
+            await axios.put(import.meta.env.VITE_PATH_ADMIN_ARTICLE + cache.id , {data: {...data , description : data.content } }  )
             notificationDispatch(success("編輯成功"))
             getData()
 
@@ -221,18 +207,19 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
     const addData = async function (data) {
         isLoading.current.classList.remove('d-none')
         try {
-            await axios.post(import.meta.env.VITE_PATH_ADMIN_PRODUCT, { "data": { ...data , is_enabled: data.is_enabled ? 1 : 0  } })
+            await axios.post(import.meta.env.VITE_PATH_ADMIN_ARTICLE, { "data": { ...data , description : data.content ,  create_at: Date.now() } })
             notificationDispatch(success("新增成功"))
             getData()
         } catch (error) {
             notificationDispatch(fail(`新增失敗，原因：${error?.message}`))
             isLoading.current.classList.add('d-none')
+            console.log(error)
         }
 
     }
 
     const onSubmit = function (data) {
-        console.log(data)
+        console.log(type)
        
         switch (type) {
             case '新增品項': addData(data)
@@ -257,7 +244,7 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
                         </div>
                         <div className="modal-footer">
                             <button type="button" onClick={delProduct} className="btn btn-danger px-16" ref={submitStatus} data-bs-dismiss="modal">刪除</button>
-                            <button type="button" className="btn btn-secondary px-16" data-bs-dismiss="modal">  取消</button>
+                            <button type="button" className="btn btn-secondary px-16" data-bs-dismiss="modal">取消</button>
                         </div>
                     </div>
                 </div>
@@ -281,51 +268,28 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
                                     <div className="invalid-feedback">請輸入標題</div>
                                 </div>
                                 <div className="mb-1">
-                                    <label htmlFor="category">類別 <span className="text-danger">*</span></label>
-                                    <input className={`form-control ${ errors.category && 'is-invalid' }`} type="text" id="category" name="category" {...register("category", { required: true })} />
-                                    <div className="invalid-feedback">請輸入類別</div>
+                                    <label htmlFor="author">作者 <span className="text-danger">*</span></label>
+                                    <input className={`form-control ${ errors.author && 'is-invalid' }`} type="text" id="author" name="author" {...register("author", { required: true })} />
+                                    <div className="invalid-feedback">請輸入作者</div>
                                 </div>
-                                <div className="mb-1">
-                                    <label htmlFor="origin_price">原價 <span className="text-danger">*</span></label>
-                                    <input className={`form-control ${ errors.origin_price && 'is-invalid' }`} type="number" id="origin_price" name="origin_price" {...register("origin_price" , {valueAsNumber:true , required:true})} />
-                                    <div className="invalid-feedback">原價欄位有誤</div>
-                                </div>
-                                <div className="mb-1">
-                                    <label htmlFor="price">售價（售價不等於原價時將自動顯示打折） <span className="text-danger">*</span></label>
-                                    <input className={`form-control ${ errors.price && 'is-invalid' }`} type="number" id="price" name="price" {...register("price", {valueAsNumber: true ,required :true})} />
-                                    <div className="invalid-feedback">售價欄位有誤</div>
-                                </div>
-                                <div className="mb-1">
-                                    <label htmlFor="unit">單位 <span className="text-danger">*</span></label>
-                                    <input className={`form-control ${ errors.unit && 'is-invalid' }`} type="text" id="unit" name="unit" {...register("unit", { required: true })} />
-                                    <div className="invalid-feedback">單位為必填</div>
-                                </div>
-                                <div className="mb-1">
-                                    <label htmlFor="description">描述</label>
+                                {/* <div className="mb-1">
+                                    <label htmlFor="description">文章內容</label>
                                     <textarea className="form-control" type="textarea" id="description" name="description" {...register("description")} />
-                                </div>                                
+                                </div>                                   */}
                                 <div className="mb-1">
-                                    <label htmlFor="content">詳細內容</label>
-                                    <textarea className="form-control" type="textarea" id="content" name="content" {...register("content")} />
+                                    <label htmlFor="content">詳細內容 <span className="text-danger">*</span></label>
+                                    <textarea rows="5" className={`form-control ${ errors.content && 'is-invalid' }`} type="textarea" id="content" name="content" {...register("content" , { required : true } )} />
+                                    <div className="invalid-feedback">內容不得為空</div>
                                 </div>
+                                {/* <div className="mb-1">
+                                    <label htmlFor="image">主圖網址</label>
+                                    <input className="form-control" type="text" id="image" name="image" {...register("image")} />
+                                </div> */}
                                 <div className="mb-1">
-                                    <label htmlFor="imageUrl">主圖網址</label>
-                                    <input className="form-control" type="url" id="imageUrl" name="imageUrl" {...register("imageUrl")} />
-                                </div>
-                                <div className="mb-1">
-                                    <label htmlFor="imagesUrl">附加圖片網址</label>
-                                    <input className="form-control" type="url"   {...register("imagesUrl.0")} />
-                                    <input className="form-control" type="url"   {...register("imagesUrl.1")} />
-                                    <input className="form-control" type="url"   {...register("imagesUrl.2")} />
-                                    <input className="form-control" type="url"   {...register("imagesUrl.3")} />
-                                    <input className="form-control" type="url"   {...register("imagesUrl.4")} />
-                                </div>
-                                <div className="mb-1">
-                                    <label htmlFor="is_enabled">啟用</label>
-                                    <input type="checkbox" id="is_enabled" name="is_enabled" {...register("is_enabled")} />
+                                    <label htmlFor="isPublic">公開文章</label>
+                                    <input type="checkbox" id="isPublic" name="isPublic" {...register("isPublic")} />
                                 </div>
                                 <input className={`btn btn-primary `} ref={submitStatus} id="submit" type="submit" data-bs-dismiss='modal' />
-                                
                             </form>
 
                         </div>
@@ -342,16 +306,18 @@ const ModalWindow = memo(({ modalController, editStatus, getData , isLoading }) 
 
 }) 
 
-//  function FormLoading( {isLoading} ) {
-//     return (
-//     <tbody className=" opacity-background-gray position-absolute h-100 w-100 d-none" ref={isLoading}>
-//         <tr></tr>
-//         <tr className=" d-flex justify-content-center align-items-center h-100">
-//             <td className="d-flex align-items-center border-0 bg-unset">
-//                 <span className="material-icons pending">refresh</span>
-//                 <p className="fs-4 fs-bolder"> 載入中...</p>
-//             </td>
-//         </tr>
-//     </tbody>)
 
-// }
+// {
+//     "data": {
+//       "title": "新增第一篇文章",
+//       "description": "文章內容",
+//       "image": "test.testtest",
+//       "tag": [
+//         "tag1"
+//       ],
+//       "create_at": 1555459220,
+//       "author": "alice",
+//       "isPublic": false,
+//       "content": "這是內容"
+//     }
+//   }

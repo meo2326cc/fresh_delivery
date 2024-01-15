@@ -1,9 +1,12 @@
 import axios from "axios";
-import { useEffect, useState , useRef } from "react";
+import { Link } from "react-router-dom";
+import { useEffect , useMemo, useRef } from "react";
 import { useSelector , useDispatch } from "react-redux";
 import { update } from "./CartSlice";
 import { success , fail } from "./ToastSlice";
 import FormLoading from "./Pending";
+import { PageTemplate } from "./ClientComponent";
+//import { useGetCartDataQuery } from "./cartUpdate";
 
 export default function Cart() {
   const cartDispatch = useDispatch()
@@ -18,6 +21,10 @@ export default function Cart() {
   const loadingOver = () => {
      cartIsLoading.current.classList.add('d-none')
   };
+
+  // const { data , error} = useGetCartDataQuery()
+  // console.log(data)
+  // console.log(error)
 
   async function getCartData() {
     try {
@@ -36,7 +43,7 @@ export default function Cart() {
       await axios.delete(import.meta.env.VITE_PATH_CLIENT_CART + id);
     getCartData()
     } catch (error) {
-      console.log(error);
+      notificationDispatch(fail( `刪除商品失敗，原因：${error?.message}` ))
     } finally {
       loadingOver();
     }
@@ -53,8 +60,8 @@ export default function Cart() {
         })
         notificationDispatch( success ( '操作成功' ))
         getCartData()
-    }catch(err){
-        notificationDispatch( fail ( '操作失敗' ))
+    }catch(error){
+        notificationDispatch( fail ( `操作失敗，原因：${error?.message}`  ))
      loadingOver()
     }
   }
@@ -71,22 +78,40 @@ export default function Cart() {
         })
         notificationDispatch( success ( '操作成功' ))
         getCartData()
-    }catch(err){
-        notificationDispatch( fail ( '操作失敗' ))
+    }catch(error){
+        notificationDispatch( fail ( `操作失敗，原因：${error?.message}` ))
      loadingOver()
     }
     }
 
   }
 
+  const pageInfo = useMemo( ()=>{
+    if ( cartContent.carts.length!== 0 ){
+      return(
+      <CartInfo cartContent={cartContent} cartIsLoading={cartIsLoading} cartQuantityAdd={cartQuantityAdd} cartQuantitySub={cartQuantitySub} delCartItem={delCartItem} />
+      )
+    }else{
+      return(<CartIsEmpty/>)
+    }
+  },[cartContent] )
+
   useEffect(() => {
     getCartData();
   }, []);
 
   return (
-    <div className="container my-10">
-      <h1 className="fs-2 mb-0 mb-5">購物車</h1>
-      <table className="table position-relative">
+    <PageTemplate title='購物車' >
+      {pageInfo}
+  </PageTemplate>);
+}
+
+
+function CartInfo( {cartContent , cartIsLoading , cartQuantityAdd , cartQuantitySub , delCartItem } ) {
+
+  console.log('cart元件選染')
+  return(<>
+          <table className="table position-relative">
         <thead className="position-relative">
           <tr className="border-dark">
             <th>品項</th>
@@ -101,16 +126,17 @@ export default function Cart() {
               <tr className="" key={item.id}>
                 <td>
                   <div className="d-flex">
-                    <div className="w-100px h100px">
+
+                    <div className="w-100px h100px me-2">
                     <img
                       src={item?.product.imageUrl}
-                      className="w-100px h-100px object-fit"
+                      className="w-100px h-100px object-fit" alt={item?.product.title}
                     />                        
                     </div>
 
-                    <div className="w-100 ms-2">
+                    <div className="w-100 ">
                       <h2 className="fs-5">{item?.product.title}</h2>
-                        <div className="d-flex justify-content-start align-items-center mw-200px mt-2">
+                        <div className="d-flex justify-content-start align-items-center mw-200px mt-2 ">
                           <p className="d-block me-2">數量</p>
                           <button
                             type="button" onClick={()=>{cartQuantitySub( item.id , item.product_id , item.qty)}}
@@ -132,6 +158,7 @@ export default function Cart() {
                           </button>
                       </div>
                     </div>
+
                   </div>
                 </td>
                 <td>
@@ -153,7 +180,18 @@ export default function Cart() {
         <h3 className="fs-5 mb-0 text-end bg-gray-100 p-3">
           總價： <span className="text-danger fw-bold">{cartContent?.final_total}</span>
         </h3>
+        <div className="d-flex justify-content-end mt-4">
+          <Link to='/checkout' className="btn btn-primary"> 下一步：填寫資料與付款 </Link>
+        </div>
       </div>
-    </div>
-  );
+  </>)
+
+
+}
+
+function CartIsEmpty(){
+  console.log('empty')
+  return(<div className="bg-gray-100 py-5 text-center">
+    <p>購物車裡面還沒有商品</p>
+  </div>)
 }

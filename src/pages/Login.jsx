@@ -44,7 +44,7 @@ export function Login() {
     },[])
     
     return (
-        <div className="container-fluid vh-100 d-flex justify-content-center align-items-center">
+        <div className="container-fluid view-height d-flex justify-content-center align-items-center">
             <div className="col-md-8 col-lg-4 col-12 rounded-3  border p-5">
             <h2>登入</h2>
             {loginFail.status && <div className="alert alert-danger" role="alert">

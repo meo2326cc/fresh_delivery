@@ -4,41 +4,24 @@ import { useDispatch } from "react-redux";
 import { success , fail } from "./ToastSlice";
 import { update } from "./CartSlice";
 import bannerImg from '../img/banner1.webp'
-import imG from '../img/pic.webp'
+import bannerImg2 from '../img/banner2.webp'
 import { Link } from "react-router-dom"
+import news from '../img/news.webp'
+import sales from '../img/sales.webp'
 //import{ state as notificationState , reducer ,  NotificationContext }from './ToastStore'
 
 
 
 function Banner(){
 
-  // const slideshowContainer = useRef(null)
-  // let w = 1032 ; 
-
-  // useEffect(()=>{
-  //   //slideshowContainer.current
-  //   w = (document.getElementById('abxd').offsetWidth) * 2;
-  //   console.log(w)
-  // },[])
-
-  return(
-    // <div className="container py-5">
-    //   {/* <div className="banner mt-5 py-5" style={{backgroundImage:`url(${bannerImg})`}}></div> */}
-    //   <div className=" banner overflow-auto" id='abxd'>
-    //     <div className="">
-    //     <div className="slideChild d-inline-block position-relative"><img src={bannerImg} className=" mw-100" alt="" /></div>
-    //     <div className="slideChild d-inline-block position-relative"><img src={imG} className=" mw-100" alt="" /></div>          
-    //     </div>
-    //   </div>
-    // </div>
-
-    <div id="carouselExampleControls" className="mt-10 carousel slide container banner overflow-hidden" data-bs-ride="carousel">
+return( 
+    <div id="carouselExampleControls" className=" carousel slide container banner overflow-hidden" data-bs-ride="carousel">
   <div className="carousel-inner">
     <div className="carousel-item active">
       <img src={bannerImg} className="d-block w-100" alt="..."/>
     </div>
     <div className="carousel-item">
-      <img src={imG} className="d-block w-100" alt="..."/>
+      <img src={bannerImg2} className="d-block w-100" alt="..."/>
     </div>
   </div>
   <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
@@ -56,21 +39,21 @@ function Banner(){
 function EventPages(){
   return(
     <div className="container mt-4">
-      <div className="row gy-10">
+      <div className="row gy-4">
         <div className="col-12 col-md-6">
           <Link to='/news'>
-            <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: 'url(https://picsum.photos/600/300)' }}>
-              <div className="transition-slide h-200px opacity-background-primary position-relative d-flex justify-content-center align-items-center">
+            <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: `url( ${news} ) `  }}>
+              <div className="d-none transition-slide h-200px opacity-background-primary position-relative d-md-flex justify-content-center align-items-center">
                 <h3 className="text-white fs-3">最新消息</h3>
               </div>
             </div>
           </Link>
         </div>
         <div className="col-12 col-md-6">
-          <Link>
-            <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: 'url(https://picsum.photos/600/300)' }}>
-              <div className="transition-slide h-200px opacity-background-primary position-relative d-flex justify-content-center align-items-center">
-                <h3 className="text-white fs-3">最新消息</h3>
+          <Link to='/category/sales'>
+            <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: `url( ${sales} )` }}>
+              <div className="d-none transition-slide h-200px opacity-background-primary position-relative d-md-flex justify-content-center align-items-center">
+                <h3 className="text-white fs-3">特價專區</h3>
               </div>
             </div>
           </Link>
@@ -95,14 +78,14 @@ function ProductList () {
 
   return(<>
   <div className="container ">
-    <div className="border-top border-1 mt-20 border-dark text-center">
+    <div className="border-top border-1 mt-10 border-dark text-center">
   <h3 className=" bg-white d-inline-block m-auto position-relative px-3 top--16">所有商品</h3>  
     </div>
   </div>
 
   <div className=" container ">
     <div className="row gy-3">
-    {list.at(0)===undefined?  <ProductListLoading/> : list.map((item , index) => {
+    {list.length === 0 ?  <ProductListLoading/> : list.map((item , index) => {
       return <Card item={item} key={index}/>
     })}        
     </div>
@@ -192,7 +175,6 @@ function Home() {
       <Banner/>
       <EventPages/>
       <ProductList/>
-      <Link to='/login'>登入</Link>
 </>
   )
 }
