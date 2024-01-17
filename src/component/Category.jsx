@@ -53,14 +53,9 @@ export default function Category () {
 
 function ProductList ({list}) {
   
-    return(<>
-    <div className="container ">
-      <div className="mt-10 border-dark text-center"> 
-      </div>
-    </div>
-  
-    <div className=" container">
-      <div className="row gy-3">
+    return(<>  
+    <div>
+      <div className="row g-4">
       {list.length === 0 ?  <ProductListLoading/> : list.map((item , index) => {
         return <Card item={item} key={index}/>
       })}        
@@ -124,7 +119,7 @@ function ProductList ({list}) {
   
         <Link to={`/Product/${id}`} className="transition-zoom" onClick={(e) => { e.target.innerHTML === '加入購物車' ? e.preventDefault() : null }}>
   
-          <div className="p-3">
+          <div className="">
             {origin_price !== price && <span className="bg-danger text-white position-absolute px-2 py-1" style={{zIndex:'1'}}>SALE</span>}
             <div className="bg-gray-200 w100 h200px">
               <div className="w-100 object-fit position-relative" style={{ backgroundImage: `url(${imageUrl})`, height: `200px `, backgroundSize: 'cover', backgroundPosition: 'center' }}>

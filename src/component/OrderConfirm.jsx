@@ -116,7 +116,7 @@ function Order({ orderInfo }) {
                     ? item.product.title.slice(0, 8) + "..."
                     : item.product.title}
                 </p>
-                <p className="text-secondary"> 數量：{item.qty} </p>
+                <p className="text-secondary"> <span className="d-md-none">x</span> <span className="d-none d-md-inline">數量：</span>{item.qty} </p>
               </div>
               <div className="d-flex justify-content-between align-items-center">
                 <p className="text-secondary">

@@ -10,7 +10,16 @@ import news from '../img/news.webp'
 import sales from '../img/sales.webp'
 //import{ state as notificationState , reducer ,  NotificationContext }from './ToastStore'
 
+export default function Home() {
 
+  return (
+<>
+      <Banner/>
+      <EventPages/>
+      <ProductList/>
+</>
+  )
+}
 
 function Banner(){
 
@@ -43,7 +52,7 @@ function EventPages(){
         <div className="col-12 col-md-6">
           <Link to='/news'>
             <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: `url( ${news} ) `  }}>
-              <div className="d-none transition-slide h-200px opacity-background-primary position-relative d-md-flex justify-content-center align-items-center">
+              <div className="d-none transition-slide h-200px opacity-background-dark position-relative d-md-flex justify-content-center align-items-center">
                 <h3 className="text-white fs-3">最新消息</h3>
               </div>
             </div>
@@ -52,7 +61,7 @@ function EventPages(){
         <div className="col-12 col-md-6">
           <Link to='/category/sales'>
             <div className="transition-slide-parent h-200px background-cover background-center overflow-hidden" style={{ backgroundImage: `url( ${sales} )` }}>
-              <div className="d-none transition-slide h-200px opacity-background-primary position-relative d-md-flex justify-content-center align-items-center">
+              <div className="d-none transition-slide h-200px opacity-background-dark position-relative d-md-flex justify-content-center align-items-center">
                 <h3 className="text-white fs-3">特價專區</h3>
               </div>
             </div>
@@ -83,8 +92,8 @@ function ProductList () {
     </div>
   </div>
 
-  <div className=" container ">
-    <div className="row gy-3">
+  <div className=" container">
+    <div className="row g-4">
     {list.length === 0 ?  <ProductListLoading/> : list.map((item , index) => {
       return <Card item={item} key={index}/>
     })}        
@@ -148,7 +157,7 @@ function Card ({item:{  title , imageUrl , id , price , origin_price}}) {
 
       <Link to={`/Product/${id}`} className="transition-zoom" onClick={(e) => { e.target.innerHTML === '加入購物車' ? e.preventDefault() : null }}>
 
-        <div className="p-3">
+        <div>
           {origin_price !== price && <span className="bg-danger text-white position-absolute px-2 py-1" style={{zIndex:'1'}}>SALE</span>}
           <div className="bg-gray-200 w100 h200px">
             <div className="w-100 object-fit position-relative" style={{ backgroundImage: `url(${imageUrl})`, height: `200px `, backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -165,18 +174,3 @@ function Card ({item:{  title , imageUrl , id , price , origin_price}}) {
 )
 
 }
-
-function Home() {
-  
-  //const NotificationReducer = useReducer( reducer , notificationState )
-
-  return (
-<>
-      <Banner/>
-      <EventPages/>
-      <ProductList/>
-</>
-  )
-}
-
-export default Home

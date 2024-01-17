@@ -22,9 +22,6 @@ export default function Cart() {
      cartIsLoading.current.classList.add('d-none')
   };
 
-  // const { data , error} = useGetCartDataQuery()
-  // console.log(data)
-  // console.log(error)
 
   async function getCartData() {
     try {
@@ -123,52 +120,80 @@ function CartInfo( {cartContent , cartIsLoading , cartQuantityAdd , cartQuantity
         <tbody>
           {cartContent?.carts?.map((item) => {
             return (
-              <tr className="" key={item.id}>
+              <tr key={item.id}>
                 <td>
                   <div className="d-flex">
-
                     <div className="w-100px h100px me-2">
-                    <img
-                      src={item?.product.imageUrl}
-                      className="w-100px h-100px object-fit" alt={item?.product.title}
-                    />                        
+                      <img
+                        src={item?.product.imageUrl}
+                        className="w-100px h-100px object-fit"
+                        alt={item?.product.title}
+                      />
                     </div>
 
                     <div className="w-100 ">
                       <h2 className="fs-5">{item?.product.title}</h2>
-                        <div className="d-flex justify-content-start align-items-center mw-200px mt-2 ">
-                          <p className="d-block me-2">數量</p>
-                          <button
-                            type="button" onClick={()=>{cartQuantitySub( item.id , item.product_id , item.qty)}}
-                            className=" btn btn-primary w-20px p-0"
-                          >
-                            <p>-</p>
-                          </button>
-                          <input
-                            type="text"
-                            value={item?.qty}
-                            className="border-0 w-38px text-center"
-                            readOnly
-                          />
-                          <button
-                            type="button" onClick={()=>{cartQuantityAdd( item.id , item.product_id , item.qty)}}
-                            className=" btn btn-primary w-20px p-0"
-                          >
-                            <p>+</p>
-                          </button>
+                      <div className="d-flex justify-content-start align-items-center mw-200px mt-2 ">
+                        <p className="d-none d-md-block me-2">數量</p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            cartQuantitySub(item.id, item.product_id, item.qty);
+                          }}
+                          className=" btn btn-primary w-20px p-0"
+                        >
+                          <p>-</p>
+                        </button>
+                        <input
+                          type="text"
+                          value={item?.qty}
+                          className="border-0 w-38px text-center"
+                          readOnly
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            cartQuantityAdd(item.id, item.product_id, item.qty);
+                          }}
+                          className=" btn btn-primary w-20px p-0"
+                        >
+                          <p>+</p>
+                        </button>
                       </div>
                     </div>
-
                   </div>
                 </td>
                 <td>
                   <div>
-                    <p className="me-2">單價：{item?.product.origin_price === item?.product.price ? null : <span className="me-1"> <del> {item?.product.origin_price} </del> </span> } { item?.product.price } * {item?.qty} </p>
-                    <p className="me-2">小計：{item?.final_total}</p>
+                    <p className="me-2">
+                      <span className="d-none d-md-inline">單價：</span>
+                      {item?.product.origin_price ===
+                      item?.product.price ? null : (
+                        <span className="me-1">
+                          
+                          <del> {item?.product.origin_price} </del>
+                        </span>
+                      )}
+                      {item?.product.price} * {item?.qty}
+                    </p>
+                    <p className="me-2">
+                      <span className="d-none d-md-inline">小計：</span>
+                      <span className="d-md-none">=</span>
+                      {item?.final_total}</p>
                   </div>
                 </td>
                 <td className="text-end">
-                    <button type="button" onClick={ ()=>{ delCartItem( item.id ) } } className="btn btn-link pe-0"> <span className="material-icons-outlined text-danger">delete_forever</span> </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      delCartItem(item.id);
+                    }}
+                    className="btn btn-link pe-0"
+                  >
+                    <span className="material-icons-outlined text-danger">
+                      delete_forever
+                    </span>
+                  </button>
                 </td>
               </tr>
             );

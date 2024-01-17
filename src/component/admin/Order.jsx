@@ -80,7 +80,7 @@ export default function Order() {
                                     <th>已付款</th>
                                     <th>總金額</th>
                                     <th>訂單建立日期</th>
-                                    <th>訂單ID</th>
+                                    <th>訂購人姓名</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
@@ -93,9 +93,9 @@ export default function Order() {
                                             <td>{item?.is_paid ? '是' : '否'}</td>
                                             <td>{item?.total}</td>
                                             <td>{ new Date(item?.create_at * 1000).toLocaleDateString() }</td>
-                                            <td>{item?.id}</td>
+                                            <td>{item?.user?.name}</td>
                                             <td>
-                                                <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-warning m-1" type="button" onClick={openOrderModal}>詳細資訊</button>
+                                                <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-warning m-1" type="button" onClick={openOrderModal}>詳細</button>
                                                 <button data-item-id={item.id} data-item-index={index} className="btn btn-outline-danger m-1" type="button" onClick={openDelModal}>del</button> </td>
                                         </tr>)
                                     })
@@ -199,6 +199,7 @@ function OrderUserInfo({ orderInfo }){
     return(
         <div className="mt-3 p-5 bg-gray-100 w-100">
         <h2 className="fs-4 mb-3">訂單資訊</h2>
+        <p className="py-1">訂單ID：{orderInfo?.id}</p>
         <p className="py-1">姓名：{orderInfo?.user?.name}</p>
         <p className="py-1">電話：{orderInfo?.user?.tel}</p>
         <p className="py-1">電子郵件：{orderInfo?.user?.email}</p>
@@ -236,7 +237,7 @@ function OrderList ({ orderInfo }) {
                       ? item.product.title.slice(0, 8) + "..."
                       : item.product.title}
                   </p>
-                  <p className="text-secondary"> 數量：{item.qty} </p>
+                  <p className="text-secondary"> <span className="d-md-none">x</span> <span className="d-none d-md-inline">數量：</span> {item.qty} </p>
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
                   <p className="text-secondary">

@@ -3,6 +3,7 @@ import logo from '../img/nav-logo.png'
 import logoBig from '../img/footer-logo.png'
 import { useEffect, useRef } from 'react'
 import { useDispatch , useSelector  } from 'react-redux'
+import { fail } from './ToastSlice'
 import { update } from './CartSlice'
 import axios from 'axios'
 
@@ -11,6 +12,7 @@ export function ClientNav() {
   const cartIsLoading = useRef(null)
   const cartListControl = useRef(null)
   const cartDispatch = useDispatch()
+  const notificationDispatch = useDispatch()
   const cartData = useSelector((data) => {
     return data.cartUpdate
   } )
@@ -27,12 +29,11 @@ export function ClientNav() {
       try {
         loading()
         const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
-        console.log(res)
         //setCartContent(res.data.data.carts)
         cartDispatch(update( res.data.data ))
         loadingOver()
       } catch (error) {
-        console.log(error)
+        notificationDispatch( fail( `取得購物車資訊失敗，原因${error.message}` ) )
       }
   }
 
@@ -44,8 +45,7 @@ export function ClientNav() {
       //setCartContent(res.data.data.carts)
       cartDispatch(update( res.data.data ))
     } catch (error) {
-      console.log(error)
-      
+      notificationDispatch( fail( `刪除購物車商品失敗，原因${error.message}` ) )
     }finally{
       loadingOver()
     }
@@ -135,7 +135,7 @@ export function Footer() {
   return (
     <div className="border-top border-primary border-3 position-relative mt-10">
       <div className="container px-3 py-5 flex-wrap flex-md-nowrap d-flex align-items-center justify-content-md-between">
-        <div className="d-flex justify-content-between col-12 col-md-4 my-5">
+        <div className="d-flex justify-content-between col-10 col-md-4 my-5">
           <div>
             <p className="text-primary mb-3 fs-6 fw-bold">商品分類</p>
             <ul className='list-unstyled'>

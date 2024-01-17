@@ -22,7 +22,7 @@ import Checkout from './component/checkout.jsx'
 import OrderConfirm from './component/OrderConfirm.jsx'
 
 
-
+document.title='鮮到家購物網站'
 ReactDOM.createRoot(document.getElementById('root')).render(
    <React.StrictMode>
     <HashRouter>

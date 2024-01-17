@@ -29,8 +29,6 @@ function submit(){
             onClick={submit}>
              送出 </button>
         </div>
-                
-         
       </div>
     </PageTemplate>
   );

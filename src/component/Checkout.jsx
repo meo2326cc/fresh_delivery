@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { PageTemplate } from "./ClientComponent";
 import { useForm  } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { update } from './CartSlice'
 import { success , fail } from "./ToastSlice";
 import { useNavigate } from "react-router";
 
@@ -12,6 +13,7 @@ export default function Checkout () {
     const submitBtn = useRef()
     const cartContent = useSelector( data => data.cartUpdate )
     const notificationDispatch = useDispatch()
+    const cartDispatch = useDispatch()
     const gotoOrderConfirm = useNavigate();
     const submitBtnDisable = ()=>{
       submitBtn.current.classList.add('disabled')
@@ -19,18 +21,26 @@ export default function Checkout () {
     const submitBtnEnable = ()=>{
       submitBtn.current.classList.remove('disabled')
     }
+    async function clearCart() {
+      try {
+        const res = await axios.get(import.meta.env.VITE_PATH_CLIENT_CART)
+        cartDispatch(update( res.data.data ))
 
+      } catch (error) {
+        notificationDispatch( fail( `取得購物車資訊失敗，原因${error.message}` ) )
+      }
+  }
     async function onSubmit(data){
       submitBtnDisable()
         try{
             const res = await axios.post(import.meta.env.VITE_PATH_CLIENT_ORDER , {'data':data} )
+            clearCart()
             notificationDispatch( success('成功建立訂單！') )
             gotoOrderConfirm(`/orderConfirm/${res.data.orderId}`)
-            console.log(res)
         }catch(error){
-            notificationDispatch( fail(`訂單建立失敗，原因：${error.message}`) )
+            notificationDispatch( fail(`訂單建立失敗，原因：${error.message}，請稍後再試`) )
         }finally{
-          submitBtnEnable()
+        submitBtnEnable()
         }
     }
 
@@ -163,7 +173,7 @@ function OrderConfirm ( {cartContent} ) {
                     ? item.product.title.slice(0, 8) + "..."
                     : item.product.title}
                 </p>
-                <p className="text-secondary"> 數量：{item.qty} </p>
+                <p className="text-secondary"> <span className="d-md-none">x</span> <span className="d-none d-md-inline">數量：</span>{item.qty} </p>
               </div>
               <div className="d-flex justify-content-between align-items-center">
               <p className="text-secondary"> 單價：

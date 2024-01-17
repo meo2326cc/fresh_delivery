@@ -12,7 +12,6 @@ export default function Toast () {
   useEffect(()=>{
 
       if(notificationState.message !== '' ){
-        //toastController.current.classList.add(notificationState.bgcolor)
         toastController.current.classList.add('show')
       }
       toastController.current.classList.remove('showing')   

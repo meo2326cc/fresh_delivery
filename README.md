@@ -1,8 +1,122 @@
-# React + Vite
+# 鮮到家網路商店
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+使用react + bootstrap 打造的spa電商系統
 
-Currently, two official plugins are available:
+連結：<https://meo2326cc.github.io/fresh_delivery/>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 為什麼做這個
+自己在學完react hooks 時給自己的挑戰，要能夠做出市面上主流的作品，包含設計在內約兩個月完成（中間因為出國所以有再多花一些時間）
+
+## 功能特色
+
+- 完整的電商系統
+- 自動顯示折扣
+- 登入功能使用JWT驗證
+- 10 支以上API串接
+
+**客戶端：**
+- 瀏覽商品
+- 購物車、結帳功能
+- 結帳
+
+**後台管理：**
+- 商品上架
+- 公告系統
+- 訂單管理
+
+
+## 核心思路
+
+### loading畫面與state處理
+這是自己第一次做大型專案，其實做到後來發現一直在處理同樣的事，就是請求資料時畫面的要如何呈現來增進使用者體驗，一開始想像的流程應該會是這樣。
+
+```flow
+st=>start: 請求資料開始
+loading=>operation: 載入等待畫面
+cond=>condition: 是否取得資料？
+success=>inputoutput: 成功，載入元件並呈現資料
+failed=>inputoutput: 顯示載入失敗
+e=>end: 結束
+
+st->loading->cond
+cond(yes)->success->e
+cond(no)->failed->e
+
+```
+
+實際的架構也大概長這樣
+
+```javascript
+ 
+    function App () {
+        const [ state, setState ] = useState( {data:[] , status:'loading'} )
+        useEffect(()=>{
+            try{
+                const res = await axios.get('remoteData.com')
+                setState({data: res , status:'success' }) 
+            }catch(error){
+                setState({...data , status:'failed' })
+            }
+        },[])
+
+        return( { state.status=== 'loading' ? <Resault state={state} /> : <loading/> } )
+    }
+
+    function Resault ({state}) {
+
+        const { data , status } = state
+
+        if(status === 'success' ) {
+           return // 載入成功拿到資料的元件
+        }eise if ( state === 'failed' ) {
+           return //  // 載入失敗的畫面
+        }
+    }
+
+```
+
+但上面的流程僅止於初次執行，
+
+隨著開發的進行也發現除了初始狀態loading畫面之後還要設計各種loading的事件，例如在已經載入`<Resault/>`的情況下要更新畫面就不能使整個流程從頭來，還有網站Toast效果也要一起與事件綁住，就會使流程變得複雜
+
+像是後台管理的表單，若直接將畫面清空再顯示可能就會使使用者無法即時看到更改的項目有變化，所以就需要顯示半透明的畫面，所以使用了`useRef`來操縱元素的class決定畫面的顯示與否，因為不需要改變文字內容所以不需要使用到state，也能減少畫面重新render的次數。
+
+```javascript
+
+    function Resault () {
+        
+        const isLoading = useRef(null)
+        const enableLoading = () => { isLoading.current.classList.remove('d-none') } // 顯示loading畫面
+        const disableLoading = () => { isLoading.current.classList.add('d-none') }  //  移除loading畫面
+
+        //元件內部操作需要重新取得資料
+        const refresh = async()=>{
+            enableLoading() // 函式執行開始，顯示loading畫面後，進入非同步處理
+            try{
+                //取得遠端資料，寫入state
+                useDispatch( success ('成功') ) // 如果成功，使用useDispatch更新跨元件的toast狀態顯示成功相關通知
+            }catch(error){
+                useDispatch( failed (`失敗，原因：${error.message}`) ) // 如果失敗，使用useDispatch更新跨元件的toast狀態顯示失敗通知
+            }finally{
+                disableLoading()   //結束顯示loading畫面
+            }
+            
+        }
+        
+    return( <>
+        <button onClick={ refresh() } >重新整理<button/>
+        <div ref={isLoading} className='d-none'>loading...<div/>
+    </> )
+
+    }
+```
+
+
+
+## 專案檢討&心得
+
+### 跨元件資料的集中管理加強
+在這個專案中麻煩的除了請求資料的畫面處理再來還有購物車與Toast通知功能這種需要跨元件傳遞資料的功能，一開始是在做Toast時僅使用useReducer與useContext來達成，但後來發後需要在每個頁面/元件逐一建立useReducer跟匯入實在過於繁瑣轉而研究使用Redux，這樣之後在建立購物車功能時確實可以集中管理也方便不少，只不過一開始的思路僅在於使用Redux來傳遞資料並沒有想到需要集中管理，像是購物車功能最大的缺點是更新資料的function 是分別寫在不同的元件，只要該元件有這項功能就會有這樣的function，除了不知道RTK Query可以用middleware來達到中央統一請求資料，也是事先缺乏規劃的原因，但現在也了解在做這樣的服務或功能需要注意的地方。
+
+### 元件拆分
+頁面一多時如果需要統一樣式時雖然使用bootstrap或tailwind等css框架是快速也不用煩惱css規則的好選擇，但還是會煩惱要讓自組元件各個utli保持統一，程式碼好像也會變得很不易維護，也是這個契機讓我想要研究UI框架，期望能快速的開發好看的介面
