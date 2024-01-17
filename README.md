@@ -81,6 +81,8 @@ cond(no)->failed->e
 
 像是後台管理的表單，若直接將畫面清空再顯示可能就會使使用者無法即時看到更改的項目有變化，所以就需要顯示半透明的畫面，所以使用了`useRef`來操縱元素的class決定畫面的顯示與否，因為不需要改變文字內容所以不需要使用到state，也能減少畫面重新render的次數。
 
+![online_store](https://github.com/meo2326cc/fresh_delivery/assets/107049397/59ae808a-ebae-4cb8-9a57-aca830d6e843)
+
 ```javascript
 
     function Resault () {
