@@ -27,6 +27,13 @@
 
 ## 核心思路
 
+### 元件安排
+以`<FrontLayout/>`來作為父元件，其包含`<Nav/>`、`<Footer/>`與`<Outlet/>`，並隨著路由切換`<Outlet/>`中的元件，以`<ProductIntro/>`顯示產品的頁面來舉例，
+當按下頁面的加入購物車按鈕後運作邏輯如下：
+
+<img width="798" alt="logic" src="https://github.com/meo2326cc/fresh_delivery/assets/107049397/858c0275-a381-40a0-afc0-6310fcc97a10">
+
+
 ### loading畫面與state處理
 這是自己第一次做大型專案，其實做到後來發現一直在處理同樣的事，就是請求資料時畫面的要如何呈現來增進使用者體驗，一開始想像的流程應該會是這樣。
 
