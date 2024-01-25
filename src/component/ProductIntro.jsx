@@ -85,7 +85,7 @@ function Product() {
                                 }
 
                                 <div className="mt-2">
-                                    <p>{product?.description}</p>
+                                    <pre className="fs-6">{product?.description}</pre>
                                 </div>
 
                                 <div className="d-flex justify-content-between flex-wrap mt-10">
@@ -107,7 +107,7 @@ function Product() {
                         <img src={product?.imageUrl} alt={product?.title} className="w-100 mb-3" />
                         {product?.imagesUrl.map((item, index) => item === '' ? null : <img key={index} src={item} alt={product?.title + '圖片' + index} className="w-100 mb-3" loading="lazy" />)}
                         <p>商品說明：</p>
-                        <p>{product?.content}</p>
+                        <pre className="fs-6">{product?.content}</pre>
                     </div>
                     <div className="position-sticky col-12 col-md-6 float-start p-3 d-none d-md-block" style={{ top: '110px' }}>
                         <div>
@@ -121,7 +121,7 @@ function Product() {
                                 }
 
                                 <div className="mt-2">
-                                    <p>{product?.description}</p>
+                                    <pre className="fs-6">{product?.description}</pre>
                                 </div>
 
                                 <div className="d-flex mt-10 flex-wrap justify-content-between">
