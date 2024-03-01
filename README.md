@@ -37,19 +37,8 @@
 ### loading 畫面與 state 處理
 這是自己第一次做大型專案，其實做到後來發現一直在處理同樣的事，就是請求資料時畫面的要如何呈現來增進使用者體驗，一開始想像的流程應該會是這樣。
 
-```flow
-st=>start: 請求資料開始
-loading=>operation: 載入等待畫面
-cond=>condition: 是否取得資料？
-success=>inputoutput: 成功，載入元件並呈現資料
-failed=>inputoutput: 顯示載入失敗
-e=>end: 結束
+![截圖 2024-03-01 下午6 42 54](https://github.com/meo2326cc/fresh_delivery/assets/107049397/aae6092b-8a96-4c7d-ac78-77319f2632b1)
 
-st->loading->cond
-cond(yes)->success->e
-cond(no)->failed->e
-
-```
 
 實際的架構也大概長這樣
 
